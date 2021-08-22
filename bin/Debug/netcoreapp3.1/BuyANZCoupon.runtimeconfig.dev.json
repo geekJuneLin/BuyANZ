@@ -1,0 +1,8 @@
+{
+  "runtimeOptions": {
+    "additionalProbingPaths": [
+      "C:\\Users\\Junyu\\.dotnet\\store\\|arch|\\|tfm|",
+      "C:\\Users\\Junyu\\.nuget\\packages"
+    ]
+  }
+}
