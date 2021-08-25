@@ -1,4 +1,5 @@
 ﻿using BuyANZCoupon.Database;
+using BuyANZCoupon.Helpers;
 using BuyANZCoupon.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -38,9 +39,34 @@ namespace BuyANZCoupon.Services
             return await _dbContext.Users.AnyAsync(u => u.Id == userId);
         }
 
-        public async Task<IList<Coupon>> GetAllValidCouponsAsync(string userId)
+        public async Task<PaginationList<Coupon>> GetAllValidCouponsAsync(string userId, string filterOperator, decimal? filterValue, int pageNumber, int pageSize)
         {
-            return await _dbContext.Coupons.Where(c => c.User.Id == userId).ToListAsync();
+            IQueryable<Coupon> coupons = _dbContext.Coupons.Where(c => c.User.Id == userId);
+
+            if (filterValue > 0)
+            {
+                coupons = filterOperator switch
+                {
+                    "greaterThan" => coupons.Where(c => c.DiscountAmount > filterValue),
+                    "lessThan" => coupons.Where(c => c.DiscountAmount < filterValue),
+                    _ => coupons.Where(c => c.DiscountAmount == filterValue),
+                };
+
+                //switch (filterOperator)
+                //{
+                //    case "greaterThan":
+                //        coupons.Where(c => c.DiscountAmount > filterValue);
+                //        break;
+                //    case "lessThan":
+                //        coupons.Where(c => c.DiscountAmount < filterValue);
+                //        break;
+                //    default:
+                //        coupons.Where(c => c.DiscountAmount == filterValue);
+                //        break;
+                //}
+            }
+
+            return await PaginationList<Coupon>.CreatePaginationListAsync(pageNumber, pageSize, coupons);
         }
 
         public async Task<ApplicationUser> GetUserById(string userId)

@@ -12,6 +12,10 @@ using System.Collections.ObjectModel;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
+using System.Diagnostics;
+using BuyANZCoupon.Helpers;
+using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 namespace BuyANZCoupon.Controllers
 {
@@ -20,32 +24,66 @@ namespace BuyANZCoupon.Controllers
     {
         private readonly ICouponRepository _CouponRepository;
         private readonly IMapper _mapper;
+        private readonly IUrlHelper _urlHelper;
 
         public CouponController
             (
                 ICouponRepository couponRepository, 
-                IMapper mapper
+                IMapper mapper,
+                IUrlHelperFactory urlHelperFactory,
+                IActionContextAccessor actionContextAccessor
             )
         {
             _CouponRepository = couponRepository;
             _mapper = mapper;
+            _urlHelper = urlHelperFactory.GetUrlHelper(actionContextAccessor.ActionContext);
         }
 
         [HttpGet("forUser/{userId}")]
         public async Task<IActionResult> GetAllValidCoupons
             (
-                [FromRoute]string userId
+                [FromRoute]string userId,
+                [FromQuery]CouponFilterParameters couponFilterParameters,
+                [FromQuery]PaginationParameters paginationParas
             )
         {
+            var couponsFromRepo = await _CouponRepository.GetAllValidCouponsAsync(
+                                                                userId, 
+                                                                couponFilterParameters.Operator, 
+                                                                couponFilterParameters.FilterValue, 
+                                                                paginationParas.PageNumber, 
+                                                                paginationParas.PageSize);
 
-            var couponsFromRepo = await _CouponRepository.GetAllValidCouponsAsync(userId);
             if (couponsFromRepo == null || couponsFromRepo.Count() <= 0)
             {
                 return NotFound("No coupons have been found for this user");
             }
 
+            var couponsDtos = _mapper.Map<IEnumerable<CouponDto>>(couponsFromRepo);
 
-            return Ok(couponsFromRepo);
+            var previousPageLink = couponsFromRepo.HasPrevious ?
+                                     GenerateTouristRouteResourceURL(couponFilterParameters, paginationParas, "prev") : 
+                                     null;
+            
+            var nextPageLink = couponsFromRepo.HasNext ?
+                                     GenerateTouristRouteResourceURL(couponFilterParameters, paginationParas, "next") :
+                                     null;
+
+            // X-Pagination
+            var paginationMetaData = new
+            {
+                previousPageLink,
+                nextPageLink,
+                totalCount = couponsFromRepo.TotalCount,
+                pageSize = couponsFromRepo.PageSize,
+                pageNumber = couponsFromRepo.PageNumber,
+                totalPages = couponsFromRepo.TotalPages
+            };
+
+            Response.Headers.Add("x-pagination", 
+                    Newtonsoft.Json.JsonConvert.SerializeObject(paginationMetaData));
+
+            return Ok(couponsDtos);
         }
 
         [HttpGet("{couponId}")]
@@ -167,6 +205,39 @@ namespace BuyANZCoupon.Controllers
             var couponDto = _mapper.Map<CouponDto>(couponFromRepo);
 
             return Ok(couponDto);
+        }
+
+        private string GenerateTouristRouteResourceURL
+            (
+                CouponFilterParameters paras1,
+                PaginationParameters paras2,
+                string type
+            )
+        {
+            return type switch
+            {
+                "prev" => _urlHelper.Link("forUser",
+                new
+                {
+                    Price = paras1.Operator + paras1.FilterValue,
+                    pageNumber = paras2.PageNumber - 1,
+                    pageSize = paras2.PageSize
+                }),
+                "next" => _urlHelper.Link("",
+                new
+                {
+                    Price = paras1.Operator + paras1.FilterValue,
+                    pageNumber = paras2.PageNumber + 1,
+                    pageSize = paras2.PageSize
+                }),
+                _ => _urlHelper.Link("",
+                new
+                {
+                    Price = paras1.Operator + paras1.FilterValue,
+                    pageNumber = paras2.PageNumber - 1,
+                    pageSize = paras2.PageSize
+                })
+            };
         }
     }
 }
