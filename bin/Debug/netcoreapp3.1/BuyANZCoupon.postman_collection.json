@@ -1,0 +1,98 @@
+{
+	"variables": [],
+	"info": {
+		"name": "BuyANZCoupon",
+		"_postman_id": "c5ffd4b6-73b4-0134-4f13-00c9ba469e57",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Generate Coupon (With Fixed Code or Random Code)",
+			"request": {
+				"url": "https://localhost:5001/api/coupon/5",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"DiscountAmount\": 99.99,\n\t\"CodeType\": \"Random\"\n}"
+				},
+				"description": "Request body:\n{\n\t\"CouponCode\"(optional): \"\",\n\t\"DiscountAmount\": \"\",\n\t\"CodeType\": \"\" (Fixed or Random)\n}"
+			},
+			"response": []
+		},
+		{
+			"name": "AssignCouponToUser",
+			"request": {
+				"url": "https://localhost:5001/api/coupon/assignTo/9c563f08-8308-49c9-b1d1-20fe7aea54dd/couponId/7ff82cf8-8661-45ee-b9e4-caa878f6599b",
+				"method": "POST",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Login and get the JWT token",
+			"request": {
+				"url": "https://localhost:5001/api/auth/login",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"email\": \"admin@buyAnz.com\",\n\t\"password\": \"admin123.\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Definition of Coupon (Admin only)",
+			"request": {
+				"url": "https://localhost:5001/api/coupon/cf203998-6b66-4332-b833-879b1b86b62f",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyNTBlMDBiZC05ODZlLTQ2NTUtODBiZC1mMGVlZmYzY2VjN2MiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBZG1pbiIsIm5iZiI6MTYyOTYwNjk1MCwiZXhwIjoxNjI5NjA4NzUwLCJpc3MiOiJCdXlBTloiLCJhdWQiOiJCdXlBTloifQ.2RhQRO6qxx2Zu2NILhMl1u4WJOxOvjo2_7kK6FLCnps",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "[\r\n  {\r\n    \"op\": \"replace\",\r\n    \"path\": \"/DiscountAmount\",\r\n    \"value\": \"109.99\"\r\n  }\r\n]"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Get coupon by Id",
+			"request": {
+				"url": "https://localhost:5001/api/coupon/cf203998-6b66-4332-b833-879b1b86b62f",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}

@@ -1,5 +1,4 @@
-﻿using BuyANZCoupon.Helpers;
-using BuyANZCoupon.Models;
+﻿using BuyANZCoupon.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +8,7 @@ namespace BuyANZCoupon.Services
 {
     public interface ICouponRepository
     {
-        public Task<PaginationList<Coupon>> GetAllValidCouponsAsync(string userId, string filterOperator, decimal? filterValue, int pageNumber, int pageSize);
+        public Task<IList<Coupon>> GetAllValidCouponsAsync(string userId);
         public void AddCoupon(Coupon coupon);
         public Task<Coupon> GetCouponById(string couponId);
         public Task<bool> IsCouonExists(string couponId);

@@ -55,3 +55,4 @@ F:\.Net\BuyANZCoupon\bin\Debug\netcoreapp3.1\Microsoft.IdentityModel.Protocols.d
 F:\.Net\BuyANZCoupon\bin\Debug\netcoreapp3.1\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
 F:\.Net\BuyANZCoupon\bin\Debug\netcoreapp3.1\Microsoft.IdentityModel.Tokens.dll
 F:\.Net\BuyANZCoupon\bin\Debug\netcoreapp3.1\System.IdentityModel.Tokens.Jwt.dll
+F:\.Net\BuyANZCoupon\bin\Debug\netcoreapp3.1\BuyANZCoupon.postman_collection.json
